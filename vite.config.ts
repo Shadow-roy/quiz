@@ -14,8 +14,18 @@ export default defineConfig({
     },
   },
 
-  // ✅ FIX CHUNK SIZE WARNING
+  // Reduce the chunk warning and split vendor code automatically
   build: {
-    chunkSizeWarningLimit: 2000, // you can increase this more if needed
+    chunkSizeWarningLimit: 2000, // raise limit (kB) to silence warning if you choose
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // make separate chunk per package (react, lodash, etc.)
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          }
+        },
+      },
+    },
   },
 });
