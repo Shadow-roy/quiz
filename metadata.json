@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Quiz",
+  "description": "A modern quiz application where users can test their knowledge. Features include timed quizzes, score tracking, a leaderboard, and an admin dashboard with AI-powered question generation.",
+  "requestFramePermissions": []
+}
