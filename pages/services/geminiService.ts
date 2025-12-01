@@ -1,11 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Question } from '@/types';
 
-if (!process.env.API_KEY) {
+// Safely retrieve API Key. If missing, it will be empty string, which the SDK might reject on call, 
+// but avoids immediate crash on module load.
+const apiKey = process.env.API_KEY || '';
+
+if (!apiKey) {
   console.warn("API_KEY environment variable not set. AI features will not work.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// Initialize client with the key (even if empty) to avoid runtime errors during import
+const ai = new GoogleGenAI({ apiKey });
 
 const questionSchema = {
     type: Type.OBJECT,
@@ -39,7 +44,7 @@ const quizSchema = {
 
 export const geminiService = {
     generateQuizQuestions: async (topic: string, count: number): Promise<Omit<Question, 'id'>[]> => {
-        if (!process.env.API_KEY) {
+        if (!apiKey) {
           throw new Error("Gemini API key is not configured.");
         }
         try {
@@ -55,6 +60,8 @@ export const geminiService = {
             });
 
             const jsonText = response.text;
+            if (!jsonText) throw new Error("No response text generated");
+            
             const parsed = JSON.parse(jsonText);
             
             if (parsed.questions && Array.isArray(parsed.questions)) {
